@@ -1,0 +1,2 @@
+train_rows,test_rows,train_columns,test_columns,unique_labels,missing_train_text,missing_test_text,unique_train_types,unique_test_types,mean_labels_per_row,max_labels_per_row
+2995,998,15,3,27,0,0,8,8,1.9703,10
