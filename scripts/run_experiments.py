@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd
 
 from src.data import load_dataset, save_table
-from src.experiments import logistic_pipeline, run_pipeline_experiment
+from src.experiments import linear_svm_pipeline, logistic_pipeline, run_pipeline_experiment, word_char_logistic_pipeline
 from src.utils import ensure_output_dirs, load_config, resolve_path
 
 
@@ -33,6 +33,22 @@ def main() -> None:
             "insight": "This tests whether source metadata and cleaner phrase features improve the baseline.",
             "use_type_token": True,
             "pipeline": logistic_pipeline((1, 3), 20_000, 2, 0.95, 1.0),
+            "threshold": 0.5,
+        },
+        {
+            "experiment_id": "exp03_tfidf_linear_svm",
+            "rationale": "Uses a margin-based Linear SVM with balanced class weights on word TF-IDF features.",
+            "insight": "This tests whether a large-margin classifier handles sparse SDG indicator language better than Logistic Regression.",
+            "use_type_token": True,
+            "pipeline": linear_svm_pipeline((1, 2), 20_000, 2, 0.95, 1.0),
+            "threshold": 0.0,
+        },
+        {
+            "experiment_id": "exp04_word_char_balanced_logreg",
+            "rationale": "Combines word and character TF-IDF features with class-balanced Logistic Regression.",
+            "insight": "Character n-grams should help with acronyms, noisy wording, and rare health indicator phrasing.",
+            "use_type_token": True,
+            "pipeline": word_char_logistic_pipeline(c_value=2.0, class_weight="balanced"),
             "threshold": 0.5,
         },
     ]

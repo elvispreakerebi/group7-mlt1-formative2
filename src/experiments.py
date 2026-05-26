@@ -61,6 +61,12 @@ def logistic_pipeline(
         max_iter=1000,
         random_state=42,
     )
+    return Pipeline(
+        [
+            ("tfidf", word_tfidf(ngram_range=ngram_range, max_features=max_features, min_df=min_df, max_df=max_df)),
+            ("model", OneVsRestClassifier(classifier)),
+        ]
+    )
 
 
 def linear_svm_pipeline(
@@ -71,12 +77,6 @@ def linear_svm_pipeline(
     c_value: float,
 ) -> Pipeline:
     classifier = LinearSVC(C=c_value, class_weight="balanced", random_state=42, max_iter=5000)
-    return Pipeline(
-        [
-            ("tfidf", word_tfidf(ngram_range=ngram_range, max_features=max_features, min_df=min_df, max_df=max_df)),
-            ("model", OneVsRestClassifier(classifier)),
-        ]
-    )
 
 
 def word_char_logistic_pipeline(c_value: float, class_weight: str | None = "balanced") -> Pipeline:
