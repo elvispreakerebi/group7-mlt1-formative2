@@ -10,9 +10,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.svm import LinearSVC
 
 from src.evaluation import binarize_scores, label_wise_metrics, multilabel_metrics
-from src.features import word_tfidf
+from src.features import combined_word_char_tfidf, word_tfidf
 from src.preprocessing import prepare_text
 
 
@@ -60,6 +61,38 @@ def logistic_pipeline(
         max_iter=1000,
         random_state=42,
     )
+
+
+def linear_svm_pipeline(
+    ngram_range: tuple[int, int],
+    max_features: int | None,
+    min_df: int,
+    max_df: float,
+    c_value: float,
+) -> Pipeline:
+    classifier = LinearSVC(C=c_value, class_weight="balanced", random_state=42, max_iter=5000)
+    return Pipeline(
+        [
+            ("tfidf", word_tfidf(ngram_range=ngram_range, max_features=max_features, min_df=min_df, max_df=max_df)),
+            ("model", OneVsRestClassifier(classifier)),
+        ]
+    )
+
+
+def word_char_logistic_pipeline(c_value: float, class_weight: str | None = "balanced") -> Pipeline:
+    classifier = LogisticRegression(
+        C=c_value,
+        class_weight=class_weight,
+        solver="liblinear",
+        max_iter=1000,
+        random_state=42,
+    )
+    return Pipeline(
+        [
+            ("tfidf", combined_word_char_tfidf()),
+            ("model", OneVsRestClassifier(classifier)),
+        ]
+    )
     return Pipeline(
         [
             ("tfidf", word_tfidf(ngram_range=ngram_range, max_features=max_features, min_df=min_df, max_df=max_df)),
@@ -90,7 +123,7 @@ def run_pipeline_experiment(
     start = time.perf_counter()
     pipeline.fit(split.x_train, split.y_train)
     runtime_seconds = time.perf_counter() - start
-    scores = pipeline.predict_proba(split.x_valid)
+    scores = _model_scores(pipeline, split.x_valid)
     predictions = binarize_scores(scores, threshold=threshold)
     metrics = multilabel_metrics(split.y_valid, predictions)
     result = {
@@ -102,3 +135,10 @@ def run_pipeline_experiment(
         **metrics,
     }
     return result, label_wise_metrics(split.y_valid, predictions, label_names, experiment_id), pipeline
+
+
+def _model_scores(pipeline: Pipeline, text: pd.Series) -> np.ndarray:
+    if hasattr(pipeline, "predict_proba"):
+        return pipeline.predict_proba(text)
+    scores = pipeline.decision_function(text)
+    return np.asarray(scores)
