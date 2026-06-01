@@ -34,3 +34,22 @@ def label_wise_metrics(y_true: np.ndarray, y_pred: np.ndarray, label_names: list
             }
         )
     return pd.DataFrame(rows)
+
+
+def tune_label_thresholds(
+    y_true: np.ndarray,
+    scores: np.ndarray,
+    threshold_grid: list[float],
+) -> np.ndarray:
+    thresholds = np.zeros(scores.shape[1], dtype=float)
+    for label_index in range(scores.shape[1]):
+        best_threshold = 0.5
+        best_loss = float("inf")
+        for threshold in threshold_grid:
+            candidate = (scores[:, label_index] >= threshold).astype(int)
+            loss = hamming_loss(y_true[:, label_index], candidate)
+            if loss < best_loss:
+                best_loss = loss
+                best_threshold = threshold
+        thresholds[label_index] = best_threshold
+    return thresholds
