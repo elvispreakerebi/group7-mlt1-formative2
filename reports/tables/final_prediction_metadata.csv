@@ -1,0 +1,2 @@
+selected_model,tfidf_weight,mean_threshold,hamming_loss,micro_f1,macro_f1,micro_precision,micro_recall,exact_match_accuracy
+tfidf_minilm_ensemble,0.7,0.5370370370370371,0.04167439559760094,0.6653426017874876,0.5968686635387835,0.8043217286914766,0.56731583403895,0.39565943238731216
