@@ -13,9 +13,12 @@ from src.experiments import (
     linear_svm_pipeline,
     logistic_pipeline,
     run_embedding_experiment,
+    run_ensemble_experiment,
     run_pipeline_experiment,
+    run_threshold_tuned_pipeline_experiment,
     word_char_logistic_pipeline,
 )
+from src.plotting import save_label_error_heatmap, save_metric_barplot
 from src.utils import ensure_output_dirs, load_config, resolve_path
 
 
@@ -120,8 +123,59 @@ def main() -> None:
         label_rows.append(label_metrics)
         print(f"{result['experiment_id']}: hamming_loss={result['hamming_loss']:.4f}, micro_f1={result['micro_f1']:.4f}")
 
-    save_table(pd.DataFrame(rows), f"{tables_dir}/experiment_results.csv")
-    save_table(pd.concat(label_rows, ignore_index=True), f"{tables_dir}/label_wise_metrics.csv")
+    threshold_grid = [float(value) for value in config["experiments"]["threshold_grid"]]
+    tuned_result, tuned_label_metrics, _, _ = run_threshold_tuned_pipeline_experiment(
+        experiment_id="exp07_tuned_word_char_logreg",
+        rationale="Tunes per-label thresholds for the strongest probability-based TF-IDF model.",
+        insight="This directly optimizes the assignment metric because Hamming Loss depends on binary label decisions.",
+        train_frame=bundle.train,
+        labels=bundle.labels,
+        label_names=bundle.label_names,
+        config=config,
+        use_type_token=True,
+        pipeline=word_char_logistic_pipeline(c_value=2.0, class_weight="balanced"),
+        threshold_grid=threshold_grid,
+    )
+    rows.append(tuned_result)
+    label_rows.append(tuned_label_metrics)
+    print(f"{tuned_result['experiment_id']}: hamming_loss={tuned_result['hamming_loss']:.4f}, micro_f1={tuned_result['micro_f1']:.4f}")
+
+    ensemble_result, ensemble_label_metrics, _ = run_ensemble_experiment(
+        experiment_id="exp08_tfidf_minilm_ensemble",
+        rationale="Combines the best sparse TF-IDF signal with MiniLM semantic embeddings.",
+        insight="This tests whether lexical phrase matching and semantic similarity make complementary errors.",
+        train_frame=bundle.train,
+        embeddings=embeddings,
+        labels=bundle.labels,
+        label_names=bundle.label_names,
+        config=config,
+        tfidf_pipeline=word_char_logistic_pipeline(c_value=2.0, class_weight="balanced"),
+        weights=[0.3, 0.5, 0.7],
+        threshold_grid=threshold_grid,
+    )
+    rows.append(ensemble_result)
+    label_rows.append(ensemble_label_metrics)
+    print(f"{ensemble_result['experiment_id']}: hamming_loss={ensemble_result['hamming_loss']:.4f}, micro_f1={ensemble_result['micro_f1']:.4f}")
+
+    results = pd.DataFrame(rows)
+    label_metrics = pd.concat(label_rows, ignore_index=True)
+    final_comparison = results.sort_values("hamming_loss").reset_index(drop=True)
+    save_table(results, f"{tables_dir}/experiment_results.csv")
+    save_table(label_metrics, f"{tables_dir}/label_wise_metrics.csv")
+    save_table(final_comparison, f"{tables_dir}/final_model_comparison.csv")
+    save_metric_barplot(
+        final_comparison,
+        metric="hamming_loss",
+        title="Validation Hamming Loss by Experiment",
+        path=f"{config['paths']['figures_dir']}/experiment_hamming_loss.png",
+    )
+    save_metric_barplot(
+        final_comparison.sort_values("micro_f1", ascending=False),
+        metric="micro_f1",
+        title="Validation Micro F1 by Experiment",
+        path=f"{config['paths']['figures_dir']}/f1_comparison.png",
+    )
+    save_label_error_heatmap(label_metrics, path=f"{config['paths']['figures_dir']}/label_error_heatmap.png")
     print(f"Experiment outputs written to {resolve_path(tables_dir)}")
 
 
