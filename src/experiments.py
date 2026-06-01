@@ -14,6 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 
 from src.evaluation import binarize_scores, label_wise_metrics, multilabel_metrics
+from src.evaluation import tune_label_thresholds
 from src.features import combined_word_char_tfidf, word_tfidf
 from src.preprocessing import prepare_text
 
@@ -24,6 +25,8 @@ class SplitData:
     x_valid: pd.Series
     y_train: np.ndarray
     y_valid: np.ndarray
+    train_idx: np.ndarray
+    valid_idx: np.ndarray
 
 
 def make_split(text: pd.Series, labels: pd.DataFrame, seed: int, validation_size: float) -> SplitData:
@@ -44,6 +47,8 @@ def make_split(text: pd.Series, labels: pd.DataFrame, seed: int, validation_size
         x_valid=text.iloc[valid_idx],
         y_train=labels.iloc[train_idx].values,
         y_valid=labels.iloc[valid_idx].values,
+        train_idx=train_idx,
+        valid_idx=valid_idx,
     )
 
 
@@ -179,6 +184,108 @@ def run_embedding_experiment(
         **metrics,
     }
     return result, label_wise_metrics(split["y_valid"], predictions, label_names, experiment_id), model
+
+
+def run_threshold_tuned_pipeline_experiment(
+    experiment_id: str,
+    rationale: str,
+    insight: str,
+    train_frame: pd.DataFrame,
+    labels: pd.DataFrame,
+    label_names: list[str],
+    config: dict[str, Any],
+    use_type_token: bool,
+    pipeline: Pipeline,
+    threshold_grid: list[float],
+) -> tuple[dict[str, Any], pd.DataFrame, Pipeline, np.ndarray]:
+    text = prepare_text(
+        train_frame,
+        use_type_token=use_type_token,
+        text_col=config["data"]["text_column"],
+        type_col=config["data"]["type_column"],
+    )
+    split = make_split(text, labels, seed=config["seed"], validation_size=config["split"]["validation_size"])
+    start = time.perf_counter()
+    pipeline.fit(split.x_train, split.y_train)
+    runtime_seconds = time.perf_counter() - start
+    scores = _model_scores(pipeline, split.x_valid)
+    thresholds = tune_label_thresholds(split.y_valid, scores, threshold_grid)
+    predictions = binarize_scores(scores, threshold=thresholds)
+    metrics = multilabel_metrics(split.y_valid, predictions)
+    result = {
+        "experiment_id": experiment_id,
+        "rationale": rationale,
+        "threshold": "per-label tuned",
+        "runtime_seconds": round(runtime_seconds, 4),
+        "interpretation": insight,
+        "mean_threshold": round(float(thresholds.mean()), 4),
+        **metrics,
+    }
+    return result, label_wise_metrics(split.y_valid, predictions, label_names, experiment_id), pipeline, thresholds
+
+
+def run_ensemble_experiment(
+    experiment_id: str,
+    rationale: str,
+    insight: str,
+    train_frame: pd.DataFrame,
+    embeddings: np.ndarray,
+    labels: pd.DataFrame,
+    label_names: list[str],
+    config: dict[str, Any],
+    tfidf_pipeline: Pipeline,
+    weights: list[float],
+    threshold_grid: list[float],
+) -> tuple[dict[str, Any], pd.DataFrame, dict[str, Any]]:
+    text = prepare_text(
+        train_frame,
+        use_type_token=True,
+        text_col=config["data"]["text_column"],
+        type_col=config["data"]["type_column"],
+    )
+    split = make_split(text, labels, seed=config["seed"], validation_size=config["split"]["validation_size"])
+    start = time.perf_counter()
+    tfidf_pipeline.fit(split.x_train, split.y_train)
+    tfidf_scores = _model_scores(tfidf_pipeline, split.x_valid)
+
+    embedding_model = OneVsRestClassifier(
+        LogisticRegression(C=1.0, solver="liblinear", max_iter=1000, random_state=42)
+    )
+    embedding_model.fit(embeddings[split.train_idx], split.y_train)
+    embedding_scores = _model_scores(embedding_model, embeddings[split.valid_idx])
+
+    best: dict[str, Any] | None = None
+    for weight in weights:
+        ensemble_scores = (weight * tfidf_scores) + ((1 - weight) * embedding_scores)
+        thresholds = tune_label_thresholds(split.y_valid, ensemble_scores, threshold_grid)
+        predictions = binarize_scores(ensemble_scores, threshold=thresholds)
+        metrics = multilabel_metrics(split.y_valid, predictions)
+        if best is None or metrics["hamming_loss"] < best["metrics"]["hamming_loss"]:
+            best = {
+                "weight": weight,
+                "thresholds": thresholds,
+                "predictions": predictions,
+                "metrics": metrics,
+            }
+    runtime_seconds = time.perf_counter() - start
+    assert best is not None
+    result = {
+        "experiment_id": experiment_id,
+        "rationale": rationale,
+        "threshold": "per-label tuned",
+        "runtime_seconds": round(runtime_seconds, 4),
+        "interpretation": insight,
+        "ensemble_tfidf_weight": best["weight"],
+        "mean_threshold": round(float(best["thresholds"].mean()), 4),
+        **best["metrics"],
+    }
+    artifacts = {
+        "tfidf_pipeline": tfidf_pipeline,
+        "embedding_model": embedding_model,
+        "thresholds": best["thresholds"],
+        "tfidf_weight": best["weight"],
+    }
+    return result, label_wise_metrics(split.y_valid, best["predictions"], label_names, experiment_id), artifacts
 
 
 def _model_scores(pipeline: Pipeline, text: pd.Series) -> np.ndarray:
