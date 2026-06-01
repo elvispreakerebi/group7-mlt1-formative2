@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import warnings
 from dataclasses import dataclass
 from typing import Any
 
@@ -289,9 +290,11 @@ def run_ensemble_experiment(
 
 
 def _model_scores(pipeline: Pipeline, text: pd.Series) -> np.ndarray:
-    if hasattr(pipeline, "predict_proba"):
-        return pipeline.predict_proba(text)
-    scores = pipeline.decision_function(text)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        if hasattr(pipeline, "predict_proba"):
+            return np.asarray(pipeline.predict_proba(text))
+        scores = pipeline.decision_function(text)
     return np.asarray(scores)
 
 
