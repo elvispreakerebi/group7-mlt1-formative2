@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.multioutput import ClassifierChain
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
@@ -137,8 +138,74 @@ def run_pipeline_experiment(
     return result, label_wise_metrics(split.y_valid, predictions, label_names, experiment_id), pipeline
 
 
+def run_embedding_experiment(
+    experiment_id: str,
+    rationale: str,
+    insight: str,
+    embeddings: np.ndarray,
+    labels: pd.DataFrame,
+    label_names: list[str],
+    config: dict[str, Any],
+    model_kind: str,
+    threshold: float = 0.5,
+    c_value: float = 1.0,
+) -> tuple[dict[str, Any], pd.DataFrame, Any]:
+    split = _split_arrays(embeddings, labels, seed=config["seed"], validation_size=config["split"]["validation_size"])
+    start = time.perf_counter()
+    if model_kind == "ovr_logreg":
+        model = OneVsRestClassifier(
+            LogisticRegression(C=c_value, solver="liblinear", max_iter=1000, random_state=42)
+        )
+    elif model_kind == "classifier_chain":
+        label_order = np.argsort(-labels.sum(axis=0).to_numpy())
+        model = ClassifierChain(
+            LogisticRegression(C=c_value, solver="liblinear", max_iter=1000, random_state=42),
+            order=label_order,
+            random_state=42,
+        )
+    else:
+        raise ValueError(f"Unsupported embedding model_kind: {model_kind}")
+    model.fit(split["x_train"], split["y_train"])
+    runtime_seconds = time.perf_counter() - start
+    scores = _model_scores(model, split["x_valid"])
+    predictions = binarize_scores(scores, threshold=threshold)
+    metrics = multilabel_metrics(split["y_valid"], predictions)
+    result = {
+        "experiment_id": experiment_id,
+        "rationale": rationale,
+        "threshold": threshold,
+        "runtime_seconds": round(runtime_seconds, 4),
+        "interpretation": insight,
+        **metrics,
+    }
+    return result, label_wise_metrics(split["y_valid"], predictions, label_names, experiment_id), model
+
+
 def _model_scores(pipeline: Pipeline, text: pd.Series) -> np.ndarray:
     if hasattr(pipeline, "predict_proba"):
         return pipeline.predict_proba(text)
     scores = pipeline.decision_function(text)
     return np.asarray(scores)
+
+
+def _split_arrays(features: np.ndarray, labels: pd.DataFrame, seed: int, validation_size: float) -> dict[str, np.ndarray]:
+    try:
+        from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
+
+        splitter = MultilabelStratifiedShuffleSplit(n_splits=1, test_size=validation_size, random_state=seed)
+        train_idx, valid_idx = next(splitter.split(features, labels.values))
+    except ModuleNotFoundError:
+        train_idx, valid_idx = train_test_split(
+            np.arange(len(features)),
+            test_size=validation_size,
+            random_state=seed,
+            shuffle=True,
+        )
+    return {
+        "x_train": features[train_idx],
+        "x_valid": features[valid_idx],
+        "y_train": labels.iloc[train_idx].values,
+        "y_valid": labels.iloc[valid_idx].values,
+        "train_idx": train_idx,
+        "valid_idx": valid_idx,
+    }
