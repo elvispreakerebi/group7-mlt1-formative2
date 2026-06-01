@@ -53,3 +53,57 @@ exp02_preprocessed_type_logreg,3.b.2 - Total net official development assistance
 exp02_preprocessed_type_logreg,3.b.3 - Proportion of health facilities that have a core set of relevant essential medicines available and affordable on a sustainable basis,79,0.17582417582417584,0.6666666666666666,0.10126582278481013
 exp02_preprocessed_type_logreg,3.c.1 - Health worker density and distribution,47,0.18867924528301888,0.8333333333333334,0.10638297872340426
 exp02_preprocessed_type_logreg,3.d.1 - International Health Regulations (IHR) capacity and health emergency preparedness,42,0.13333333333333333,1.0,0.07142857142857142
+exp03_tfidf_linear_svm,3.1.1 - Maternal mortality ratio,30,0.5423728813559322,0.5517241379310345,0.5333333333333333
+exp03_tfidf_linear_svm,3.1.2 - Proportion of births attended by skilled health personnel,18,0.13793103448275862,0.18181818181818182,0.1111111111111111
+exp03_tfidf_linear_svm,3.2.1 - Under-5 mortality rate,45,0.55,0.6285714285714286,0.4888888888888889
+exp03_tfidf_linear_svm,3.2.2 - Neonatal mortality rate,19,0.2857142857142857,0.4444444444444444,0.21052631578947367
+exp03_tfidf_linear_svm,"3.3.1 - Number of new HIV infections per 1,000 uninfected population, by sex, age and key populations",78,0.8611111111111112,0.9393939393939394,0.7948717948717948
+exp03_tfidf_linear_svm,"3.3.2 - Tuberculosis incidence per 100,000 population",47,0.8192771084337349,0.9444444444444444,0.723404255319149
+exp03_tfidf_linear_svm,"3.3.3 - Malaria incidence per 1,000 population",45,0.7894736842105263,0.967741935483871,0.6666666666666666
+exp03_tfidf_linear_svm,"3.3.4 - Hepatitis B incidence per 100,000 population",17,0.3,1.0,0.17647058823529413
+exp03_tfidf_linear_svm,3.3.5 - Number of people requiring interventions against neglected tropical diseases,34,0.5538461538461539,0.5806451612903226,0.5294117647058824
+exp03_tfidf_linear_svm,"3.4.1 - Mortality rate attributed to cardiovascular disease, cancer, diabetes or chronic respiratory disease",93,0.7513812154696132,0.7727272727272727,0.7311827956989247
+exp03_tfidf_linear_svm,3.4.2 - Suicide mortality rate,11,0.4444444444444444,0.375,0.5454545454545454
+exp03_tfidf_linear_svm,"3.5.1 - Coverage of treatment interventions (pharmacological, psychosocial and rehabilitation and aftercare services) for substance use disorders",16,0.625,0.625,0.625
+exp03_tfidf_linear_svm,"3.5.2 - Harmful use of alcohol, defined according to the national context as alcohol per capita consumption (aged 15 years and older) within a calendar year in litres of pure alcohol",15,0.56,0.7,0.4666666666666667
+exp03_tfidf_linear_svm,3.6.1 - Death rate due to road traffic injuries,3,0.5,1.0,0.3333333333333333
+exp03_tfidf_linear_svm,3.7.1 - Proportion of women of reproductive age (aged 15_49 years) who have their need for family planning satisfied with modern methods,35,0.6666666666666666,0.75,0.6
+exp03_tfidf_linear_svm,"3.7.2 - Adolescent birth rate (aged 10_14 years; aged 15_19 years) per 1,000 women in that age group",32,0.7586206896551724,0.8461538461538461,0.6875
+exp03_tfidf_linear_svm,"3.8.1 - Coverage of essential health services (defined as the average coverage of essential services based on tracer interventions that include reproductive, maternal, newborn and child health, infectious diseases, non-communicable diseases and service capacity and access, among the general and the most disadvantaged population)",102,0.5560975609756098,0.5533980582524272,0.5588235294117647
+exp03_tfidf_linear_svm,3.8.2 - Proportion of population with large household expenditures on health as a share of total household expenditure or income,33,0.37037037037037035,0.47619047619047616,0.30303030303030304
+exp03_tfidf_linear_svm,3.9.1 - Mortality rate attributed to household and ambient air pollution,9,0.3076923076923077,0.5,0.2222222222222222
+exp03_tfidf_linear_svm,"3.9.2 - Mortality rate attributed to unsafe water, unsafe sanitation and lack of hygiene (exposure to unsafe Water, Sanitation and Hygiene for All (WASH) services)",36,0.6764705882352942,0.71875,0.6388888888888888
+exp03_tfidf_linear_svm,3.9.3 - Mortality rate attributed to unintentional poisoning,13,0.2,0.2857142857142857,0.15384615384615385
+exp03_tfidf_linear_svm,3.a.1 - Age-standardized prevalence of current tobacco use among persons aged 15 years and older,16,0.5925925925925926,0.7272727272727273,0.5
+exp03_tfidf_linear_svm,3.b.1 - Proportion of the target population covered by all vaccines included in their national programme,39,0.6376811594202898,0.7333333333333333,0.5641025641025641
+exp03_tfidf_linear_svm,3.b.2 - Total net official development assistance to medical research and basic health sector,215,0.7402298850574712,0.7318181818181818,0.7488372093023256
+exp03_tfidf_linear_svm,3.b.3 - Proportion of health facilities that have a core set of relevant essential medicines available and affordable on a sustainable basis,79,0.546583850931677,0.5365853658536586,0.5569620253164557
+exp03_tfidf_linear_svm,3.c.1 - Health worker density and distribution,47,0.5287356321839081,0.575,0.48936170212765956
+exp03_tfidf_linear_svm,3.d.1 - International Health Regulations (IHR) capacity and health emergency preparedness,42,0.5866666666666667,0.6666666666666666,0.5238095238095238
+exp04_word_char_balanced_logreg,3.1.1 - Maternal mortality ratio,30,0.5294117647058824,0.47368421052631576,0.6
+exp04_word_char_balanced_logreg,3.1.2 - Proportion of births attended by skilled health personnel,18,0.24242424242424243,0.26666666666666666,0.2222222222222222
+exp04_word_char_balanced_logreg,3.2.1 - Under-5 mortality rate,45,0.6236559139784946,0.6041666666666666,0.6444444444444445
+exp04_word_char_balanced_logreg,3.2.2 - Neonatal mortality rate,19,0.47058823529411764,0.5333333333333333,0.42105263157894735
+exp04_word_char_balanced_logreg,"3.3.1 - Number of new HIV infections per 1,000 uninfected population, by sex, age and key populations",78,0.87248322147651,0.9154929577464789,0.8333333333333334
+exp04_word_char_balanced_logreg,"3.3.2 - Tuberculosis incidence per 100,000 population",47,0.8181818181818182,0.8780487804878049,0.7659574468085106
+exp04_word_char_balanced_logreg,"3.3.3 - Malaria incidence per 1,000 population",45,0.759493670886076,0.8823529411764706,0.6666666666666666
+exp04_word_char_balanced_logreg,"3.3.4 - Hepatitis B incidence per 100,000 population",17,0.5217391304347826,1.0,0.35294117647058826
+exp04_word_char_balanced_logreg,3.3.5 - Number of people requiring interventions against neglected tropical diseases,34,0.647887323943662,0.6216216216216216,0.6764705882352942
+exp04_word_char_balanced_logreg,"3.4.1 - Mortality rate attributed to cardiovascular disease, cancer, diabetes or chronic respiratory disease",93,0.7675675675675676,0.7717391304347826,0.7634408602150538
+exp04_word_char_balanced_logreg,3.4.2 - Suicide mortality rate,11,0.4375,0.3333333333333333,0.6363636363636364
+exp04_word_char_balanced_logreg,"3.5.1 - Coverage of treatment interventions (pharmacological, psychosocial and rehabilitation and aftercare services) for substance use disorders",16,0.55,0.4583333333333333,0.6875
+exp04_word_char_balanced_logreg,"3.5.2 - Harmful use of alcohol, defined according to the national context as alcohol per capita consumption (aged 15 years and older) within a calendar year in litres of pure alcohol",15,0.6428571428571429,0.6923076923076923,0.6
+exp04_word_char_balanced_logreg,3.6.1 - Death rate due to road traffic injuries,3,0.4,0.5,0.3333333333333333
+exp04_word_char_balanced_logreg,3.7.1 - Proportion of women of reproductive age (aged 15_49 years) who have their need for family planning satisfied with modern methods,35,0.7272727272727273,0.7741935483870968,0.6857142857142857
+exp04_word_char_balanced_logreg,"3.7.2 - Adolescent birth rate (aged 10_14 years; aged 15_19 years) per 1,000 women in that age group",32,0.7586206896551724,0.8461538461538461,0.6875
+exp04_word_char_balanced_logreg,"3.8.1 - Coverage of essential health services (defined as the average coverage of essential services based on tracer interventions that include reproductive, maternal, newborn and child health, infectious diseases, non-communicable diseases and service capacity and access, among the general and the most disadvantaged population)",102,0.5814977973568282,0.528,0.6470588235294118
+exp04_word_char_balanced_logreg,3.8.2 - Proportion of population with large household expenditures on health as a share of total household expenditure or income,33,0.40625,0.41935483870967744,0.3939393939393939
+exp04_word_char_balanced_logreg,3.9.1 - Mortality rate attributed to household and ambient air pollution,9,0.25,0.2857142857142857,0.2222222222222222
+exp04_word_char_balanced_logreg,"3.9.2 - Mortality rate attributed to unsafe water, unsafe sanitation and lack of hygiene (exposure to unsafe Water, Sanitation and Hygiene for All (WASH) services)",36,0.6923076923076923,0.6428571428571429,0.75
+exp04_word_char_balanced_logreg,3.9.3 - Mortality rate attributed to unintentional poisoning,13,0.15384615384615385,0.15384615384615385,0.15384615384615385
+exp04_word_char_balanced_logreg,3.a.1 - Age-standardized prevalence of current tobacco use among persons aged 15 years and older,16,0.6666666666666666,0.6470588235294118,0.6875
+exp04_word_char_balanced_logreg,3.b.1 - Proportion of the target population covered by all vaccines included in their national programme,39,0.7073170731707317,0.6744186046511628,0.7435897435897436
+exp04_word_char_balanced_logreg,3.b.2 - Total net official development assistance to medical research and basic health sector,215,0.7387387387387387,0.7161572052401747,0.7627906976744186
+exp04_word_char_balanced_logreg,3.b.3 - Proportion of health facilities that have a core set of relevant essential medicines available and affordable on a sustainable basis,79,0.5641025641025641,0.47413793103448276,0.6962025316455697
+exp04_word_char_balanced_logreg,3.c.1 - Health worker density and distribution,47,0.5490196078431373,0.509090909090909,0.5957446808510638
+exp04_word_char_balanced_logreg,3.d.1 - International Health Regulations (IHR) capacity and health emergency preparedness,42,0.5909090909090909,0.5652173913043478,0.6190476190476191
