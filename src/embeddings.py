@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import numpy as np
@@ -27,6 +28,8 @@ def encode_with_sentence_transformer(
     if cache_path.exists():
         return np.load(cache_path)
 
+    os.environ.setdefault("USE_TF", "0")
+    os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
     from sentence_transformers import SentenceTransformer
 
     ensure_dir(cache_path.parent)
