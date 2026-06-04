@@ -14,7 +14,10 @@ def load_config(path: str | Path = "config.yaml") -> dict[str, Any]:
     try:
         import yaml
 
-        return yaml.safe_load(text)
+        config = yaml.safe_load(text)
+        if not isinstance(config, dict):
+            raise ValueError(f"Config at {config_path} must be a mapping, got {type(config).__name__}")
+        return config
     except ModuleNotFoundError:
         return _parse_simple_yaml(text)
 
