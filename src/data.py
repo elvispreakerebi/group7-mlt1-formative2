@@ -65,7 +65,7 @@ def parse_label_lists(train: pd.DataFrame, config: dict[str, Any]) -> list[list[
 def build_label_matrix(label_lists: list[list[str]]) -> tuple[pd.DataFrame, MultiLabelBinarizer]:
     mlb = MultiLabelBinarizer()
     matrix = mlb.fit_transform(label_lists)
-    labels = pd.DataFrame(matrix, columns=mlb.classes_).astype("int8")
+    labels = pd.DataFrame(matrix, columns=mlb.classes_).astype("int16")
     return labels, mlb
 
 
